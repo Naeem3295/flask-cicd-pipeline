@@ -2,33 +2,14 @@ pipeline {
     agent any
 
     environment {
-        // Docker Hub info
         DOCKER_HUB_USER = "naeem3295"
         IMAGE_NAME      = "flask-cicd-pipeline"
         IMAGE_TAG       = "v${BUILD_NUMBER}"
-        
-        // Notification info
-        EMAIL_TO      = "abunaeem059322@gmail.com"
-        SLACK_CHANNEL = "#all-jenkins-cicd"
+        EMAIL_TO        = "abunaeem059322@gmail.com"
     }
 
     stages {
 
-        stage('Notify Start') {
-            steps {
-                slackSend(
-                    tokenCredentialId: 'slack-webhook-new',
-                    channel: "${SLACK_CHANNEL}",
-                    color: '#FFFF00',
-                    message: """🔄 Build Started!
-Job: ${JOB_NAME}
-Build: #${BUILD_NUMBER}
-Triggered: ${currentBuild.getBuildCauses()[0].shortDescription}"""
-                )
-            }
-        }
-
-        
         stage('Checkout') {
             steps {
                 echo "================================"
@@ -38,7 +19,6 @@ Triggered: ${currentBuild.getBuildCauses()[0].shortDescription}"""
             }
         }
 
-       
         stage('Run Tests') {
             steps {
                 echo "Running unit tests..."
@@ -53,7 +33,6 @@ Triggered: ${currentBuild.getBuildCauses()[0].shortDescription}"""
             }
         }
 
-
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image..."
@@ -63,7 +42,6 @@ Triggered: ${currentBuild.getBuildCauses()[0].shortDescription}"""
             }
         }
 
-     
         stage('Push to Docker Hub') {
             steps {
                 echo "Pushing to Docker Hub..."
@@ -81,7 +59,6 @@ Triggered: ${currentBuild.getBuildCauses()[0].shortDescription}"""
             }
         }
 
-
         stage('Deploy') {
             steps {
                 echo "Deploying application..."
@@ -97,7 +74,6 @@ Triggered: ${currentBuild.getBuildCauses()[0].shortDescription}"""
                 echo "Deployed at http://localhost:5050"
             }
         }
-
 
         stage('Health Check') {
             steps {
@@ -117,24 +93,6 @@ Triggered: ${currentBuild.getBuildCauses()[0].shortDescription}"""
 
         success {
             echo "Pipeline SUCCESS!"
-
-            // Slack এ success message
-            slackSend(
-                tokenCredentialId: 'slack-webhook-new',
-                channel: "${SLACK_CHANNEL}",
-                color: 'good',
-                message: """✅ Pipeline SUCCESS!
-━━━━━━━━━━━━━━━━━━
-Job: ${JOB_NAME}
-Build: #${BUILD_NUMBER}
-Duration: ${currentBuild.durationString}
-Image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
-App: http://localhost:5050
-URL: ${BUILD_URL}
-━━━━━━━━━━━━━━━━━━"""
-            )
-
-            // Email এ success message
             emailext(
                 to: "${EMAIL_TO}",
                 subject: "✅ SUCCESS: ${JOB_NAME} #${BUILD_NUMBER}",
@@ -166,7 +124,7 @@ URL: ${BUILD_URL}
 </tr>
 </table>
 <br>
-<a href="${BUILD_URL}" 
+<a href="${BUILD_URL}"
    style="background:#28a745;color:white;padding:10px 20px;
           text-decoration:none;border-radius:5px;">
    View Build
@@ -179,23 +137,6 @@ URL: ${BUILD_URL}
 
         failure {
             echo "Pipeline FAILED!"
-
-            // Slack এ failure message
-            slackSend(
-                tokenCredentialId: 'slack-webhook-new',
-                channel: "${SLACK_CHANNEL}",
-                color: 'danger',
-                message: """❌ Pipeline FAILED!
-━━━━━━━━━━━━━━━━━━
-Job: ${JOB_NAME}
-Build: #${BUILD_NUMBER}
-Duration: ${currentBuild.durationString}
-Console: ${BUILD_URL}console
-━━━━━━━━━━━━━━━━━━
-Check console for details!"""
-            )
-
-            // Email এ failure message
             emailext(
                 to: "${EMAIL_TO}",
                 subject: "❌ FAILED: ${JOB_NAME} #${BUILD_NUMBER}",
@@ -217,7 +158,7 @@ Check console for details!"""
 </tr>
 </table>
 <br>
-<a href="${BUILD_URL}console" 
+<a href="${BUILD_URL}console"
    style="background:#dc3545;color:white;padding:10px 20px;
           text-decoration:none;border-radius:5px;">
    View Error
