@@ -24,7 +24,7 @@ pipeline {
                 echo "Running unit tests..."
                 sh """
                     docker run --rm \
-                        -v ${WORKSPACE}:/app \
+                        -v \${WORKSPACE}:/app \
                         -w /app \
                         python:3.11-slim \
                         sh -c "pip install -r requirements.txt -q && pytest test_app.py -v"
