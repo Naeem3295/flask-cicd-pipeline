@@ -9,7 +9,7 @@ pipeline {
         
         // Notification info
         EMAIL_TO      = "abunaeem059322@gmail.com"
-        SLACK_CHANNEL = "#general"
+        SLACK_CHANNEL = "#all-jenkins-cicd"
     }
 
     stages {
@@ -17,6 +17,7 @@ pipeline {
         stage('Notify Start') {
             steps {
                 slackSend(
+                    tokenCredentialId: 'slack-webhook-new',
                     channel: "${SLACK_CHANNEL}",
                     color: '#FFFF00',
                     message: """🔄 Build Started!
@@ -119,6 +120,7 @@ Triggered: ${currentBuild.getBuildCauses()[0].shortDescription}"""
 
             // Slack এ success message
             slackSend(
+                tokenCredentialId: 'slack-webhook-new',
                 channel: "${SLACK_CHANNEL}",
                 color: 'good',
                 message: """✅ Pipeline SUCCESS!
@@ -180,6 +182,7 @@ URL: ${BUILD_URL}
 
             // Slack এ failure message
             slackSend(
+                tokenCredentialId: 'slack-webhook-new',
                 channel: "${SLACK_CHANNEL}",
                 color: 'danger',
                 message: """❌ Pipeline FAILED!
